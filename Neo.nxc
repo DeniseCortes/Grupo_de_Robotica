@@ -1,11 +1,12 @@
 //O #define: Define valores constantes dentro de todo o seu código
-#define white 50 // : Deixando um valor constante do que será usado em código como branco
-#define grey 35
-#define distancia 20
+#define white 50 //: Deixando um valor constante do que será usado em código como o que será interpretado pelo robô como a cor branca.
+#define grey 35 //: E aqui o que será interpretado como a cor preta
+#define distancia //: Aqui definimos a distancia padrão medida pelo sonar do robô
 
 bool obstaculo(){
     return(SensorUS(IN_3) <= 0) ? false : SensorUS(IN_3) <= distancia;
 }
+// : A função bool obstaculo() nos retorna um valor de true ou false para o código,se o sonar medir a distncia padrão
 int determinarEstado(int e){
     if(obstaculo()){
         e = 1;
