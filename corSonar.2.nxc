@@ -1,0 +1,45 @@
+#define SENSOR_COR_DIR IN_1
+#define SENSOR_COR_ESQ IN_2
+#define SENSOR_SONAR IN_3
+#define VEL_LINEAR 50
+#define VEL_ANG 35
+#define PRETO 299
+#define BRANCO 350
+#define DISTANCIA 10
+
+task main(){
+    SetSensorType(SENSOR_COR_DIR, SENSOR_TYPE_COLORBLUE);
+    SetSensorType(SENSOR_COR_ESQ, SENSOR_TYPE_COLORBLUE);
+    SetSensorType(SENSOR_SONAR, SENSOR_TYPE_LOWSPEED);
+
+    while(true){
+        NumOut(10, LCD_LINE1, Sensor(SENSOR_COR_DIR));
+        NumOut(50, LCD_LINE1, Sensor(SENSOR_COR_ESQ));
+        NumOut(90, LCD_LINE1, SensorUS(SENSOR_SONAR));
+        OnRev(OUT_AB, VEL_LINEAR);
+
+        if(SensorUS(SENSOR_SONAR) == DISTANCIA){
+            Off(OUT_AB);
+            Wait(800);
+            OnFwd(OUT_A, VEL_LINEAR);
+            OnFwd(OUT_A, VEL_LINEAR + VEL_ANG);
+            Wait(1000);
+            OnRev(OUT_AB, VEL_LINEAR);
+            Wait(4000);
+            OnFwd(OUT_B, VEL_LINEAR + VEL_ANG);
+            Wait(1300);
+            OnRev(OUT_AB, VEL_LINEAR);
+        }
+
+        if(Sensor(SENSOR_COR_DIR) >= BRANCO && Sensor(SENSOR_COR_ESQ) <= PRETO){
+            OnFwd(OUT_B, VEL_ANG);
+            OnRev(OUT_A, VEL_LINEAR + VEL_ANG);
+            Wait(500);
+        }
+        if(Sensor(SENSOR_COR_ESQ) >= BRANCO && Sensor(SENSOR_COR_DIR) <= PRETO){
+            OnFwd(OUT_A, VEL_ANG);
+            OnRev(OUT_B, VEL_LINEAR + VEL_ANG);
+            Wait(500);
+        }
+    }
+}

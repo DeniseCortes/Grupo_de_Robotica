@@ -1,0 +1,29 @@
+#define SENSOR_LUZ_DIR IN_1
+#define SENSOR_LUZ_ESQ IN_2
+#define VEL_LINEAR 60
+#define VEL_ANG 15
+#define PRETO 399
+#define BRANCO 499
+#define DISTANCIA 10
+
+task main(){
+    SetSensorType(SENSOR_LUZ_DIR, SENSOR_TYPE_LIGHT_ACTIVE);
+    SetSensorType(SENSOR_LUZ_ESQ, SENSOR_TYPE_LIGHT_ACTIVE);000
+
+    while(true){
+        NumOut(10, LCD_LINE2, Sensor(SENSOR_LUZ_DIR));
+        NumOut(50, LCD_LINE2, Sensor(SENSOR_LUZ_ESQ));
+        OnRev(OUT_AB, VEL_LINEAR);
+
+        if(Sensor(SENSOR_LUZ_DIR) >= BRANCO && Sensor(SENSOR_LUZ_ESQ) <= PRETO){
+            OnRev(OUT_A, VEL_LINEAR);
+            OnFwd(OUT_B, VEL_LINEAR + VEL_ANG);
+            Wait(800);
+        }
+        if(Sensor(SENSOR_LUZ_ESQ) >= BRANCO && Sensor(SENSOR_LUZ_DIR) <= PRETO){
+			OnFwd(OUT_B, VEL_LINEAR);
+            OnRev(OUT_A, VEL_LINEAR + VEL_ANG);
+            Wait(800);
+        }
+    }
+}

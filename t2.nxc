@@ -1,0 +1,10 @@
+task main(){
+
+    while(true){
+
+        RotateMotorEx(OUT_AB, -60, 1747, 0, true, false);
+        Float(OUT_AB);
+        Wait(5000);
+
+   }
+}

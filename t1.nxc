@@ -1,0 +1,38 @@
+#define SENSOR_SONAR_FRENTE IN_3
+#define SENSOR_SONAR_DIR IN_4
+#define VELOCIDADE 60
+#define VEL_ANGULAR 25
+#define MAX_PAREDE_X 70
+#define MAX_PAREDE_Y 50
+#define RAIO 0.45
+
+task main(){
+
+    SetSensorLowspeed(SENSOR_SONAR_FRENTE);
+
+    SetSensorLowspeed(SENSOR_SONAR_DIR);
+
+    float x;
+
+    float y;
+
+    float theta = 0;
+
+    while(true){
+
+    x = SensorUS(SENSOR_SONAR_FRENTE);
+
+    y = SensorUS(SENSOR_SONAR_DIR);
+
+        NumOut(20, LCD_LINE1, y);
+        NumOut(20, LCD_LINE2, x);
+        NumOut(20, LCD_LINE3, theta);
+
+        float s = Sin(90);
+
+        float c = Cos(theta);
+
+        theta = y - x * s;
+    }
+}
+

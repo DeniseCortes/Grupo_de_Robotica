@@ -1,0 +1,76 @@
+#include "pose.h"
+#include "controle.h"
+
+task main(){
+
+    float som_erro_theta = 0;
+    float erro_theta = 0;
+    float erro_linear = 0;
+	int ponto = 0;
+	Pose pose_atual;
+	Pose pose_anterior;
+
+	SetSensorLowspeed(IN_4);
+	SetSensorLowspeed(IN_3);
+
+	float SonarFront;
+	float SonarLater;
+	float angulo_robo;
+	float diferenca_dist;
+	float hipotenusa;
+	float ang;
+	
+	float cat_ops_ref;
+
+	Acionamento motor;	
+	Pose pose_ref[1];
+    //ANDAR PARA FRENTE
+    pose_ref[0].x = 30;
+    pose_ref[0].y = 0;
+    pose_ref[0].theta = 0;
+
+	Pose refer;
+    refer.x = 0;
+    refer.y = 0;
+    refer.theta = 0;
+
+	pose_anterior.x = 0;
+	pose_anterior.y = 0;
+	pose_anterior.theta = 0;
+
+	refer = pose_ref[ponto];
+
+    while(true){
+
+	SonarFront = SensorUS(IN_4);
+	SonarLater = SensorUS(IN_3);
+	diferenca_dist = SonarLater;
+	
+	erro_linear = -(controle_linear(refer,pose_atual,motor));
+	OnFwdSyncPID(OUT_AB, motor.vel, motor.per_giro, 30, 90, 50);
+	erro_theta = atan2(refer.theta - pose_atual.theta);
+ 	atualiza_pose2(pose_atual);
+
+	hipotenusa = calc_dist(pose_atual,pose_anterior);
+	angulo_robo = robo_ang(hipotenusa,SonarLater);
+	//ang = Co_real(cat_ops_ref,SonarLater,hipotenusa);
+	cat_ops_ref	= Co_ref(refer,angulo_robo);
+	
+
+	TextOut(10,LCD_LINE4,"dist-lat:");
+	NumOut(60, LCD_LINE4,SonarLater);
+	TextOut(10,LCD_LINE3,"angulo:");
+	NumOut(60, LCD_LINE3,angulo_robo);
+	TextOut(10,LCD_LINE2,"hip:");
+	NumOut(60,LCD_LINE2,hipotenusa);
+	TextOut(10,LCD_LINE6,"cat_ref:");
+	NumOut(60,LCD_LINE6,cat_ops_ref);
+
+	pose_anterior = pose_atual;
+	atualiza_pose2(pose_atual);		
+	Wait(1000);
+	ClearScreen();
+    
+	}
+
+}

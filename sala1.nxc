@@ -1,0 +1,22 @@
+task main(){
+    SetSensorLight(IN_3);
+    while(true){
+    //   NumOut(50,LCD_LINE1,estado);
+        if(Sensor(IN_3) =< 20){
+            OnFwd(OUT_AB, 50);
+        }
+        if(Sensor(IN_3) => 30){
+            RotateMotorEx(OUT_AB, 50, 360, 100, true, false);
+            if(Sensor(IN_3) =< 20){
+                OnRev(OUT_B, 50);
+                Float(OUT_A);
+            }else{
+            RotateMotorEx(OUT_AB, 50, 360, -100, true, false);
+                if(Sensor(IN_3) =< 20){
+                    OnRev(OUT_B, 50);
+                    Float(OUT_A);
+                }
+            }
+        }
+    }
+}

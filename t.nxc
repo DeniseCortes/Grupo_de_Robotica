@@ -1,0 +1,51 @@
+#include "pose.h"
+
+task main(){
+
+    float x = 0;
+    float y = 0;
+    float theta = 0;
+    float theta_referencia = 0;
+    float erro_theta = 0;
+    float som_erro_theta = 0;
+    int percent_giro = 0; //var
+    float P = -1;
+    float I = -0.55;
+
+    while(true){
+
+        OnRevSyncPID(OUT_AB, 50, -percent_giro, 30, 50, 90);
+
+        atualiza_pose(x,y,theta);
+
+        erro_theta = theta_referencia - theta;
+
+        som_erro_theta += erro_theta;
+
+        percent_giro = P * erro_theta;
+
+        percent_giro += I * som_erro_theta;
+
+        if(percent_giro > 100){
+            percent_giro = 100;
+        }
+
+        if(percent_giro  < -100){
+            percent_giro = -100;
+        }
+
+        ClearScreen();
+
+        NumOut(60, LCD_LINE1, y);
+        NumOut(60, LCD_LINE2, x);
+        NumOut(60, LCD_LINE3, theta);
+        NumOut(60, LCD_LINE4, inc_linear);
+        NumOut(60, LCD_LINE5, inc_angular);
+        NumOut(60, LCD_LINE6, erro_theta);
+        NumOut(60, LCD_LINE7, som_erro_theta);
+        NumOut(60, LCD_LINE8, percent_giro);
+
+        Wait(1000);
+
+    }
+}

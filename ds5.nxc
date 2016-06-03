@@ -1,0 +1,81 @@
+#define SENSOR_LUZ_DIR IN_2
+#define SENSOR_LUZ_ESQ IN_1
+//#define SENSOR_SONAR IN_3
+#define PRETO 470 //maximo
+#define BRANCO 650 //minimo
+#define DISTANCIA 20 //cm
+#define VEL_LINEAR -50
+#define VEL_ANG -20
+
+enum{
+    FRENTE = 1;
+    GIRAR_ESQUERDA = 2;
+    GIRAR_DIREITA = 3
+};
+
+bool andar_frente(){
+    return(Sensor(SENSOR_LUZ_DIR) >= BRANCO && Sensor(SENSOR_LUZ_ESQ) >= BRANCO);
+}
+
+bool girar_esquerda(){
+    return(Sensor(SENSOR_LUZ_DIR) >= BRANCO && Sensor(SENSOR_LUZ_ESQ) <= PRETO);
+}
+
+bool girar_direita(){
+    return(Sensor(SENSOR_LUZ_DIR) <= PRETO && Sensor(SENSOR_LUZ_ESQ) >= BRANCO);
+}
+
+int determinarEstado(int e){
+    if(andar_frente() == true){
+        e = FRENTE;
+    }
+    if(girar_esquerda() == true){
+        e = GIRAR_ESQUERDA;
+    }
+    if(girar_direita() == true){
+        e = GIRAR_DIREITA;
+    }
+return e;
+}
+
+task main(){
+    SetSensorType(SENSOR_LUZ_DIR, SENSOR_TYPE_LIGHT_ACTIVE);
+    SetSensorType(SENSOR_LUZ_ESQ, SENSOR_TYPE_LIGHT_ACTIVE);
+  //  SetSensorType(SENSOR_SONAR, SENSOR_TYPE_LOWSPEED);
+	int estado;
+
+    while(true){
+
+        estado = determinarEstado(estado);
+        if(estado == FRENTE){
+			OnRev(OUT_AB, VEL_LINEAR);
+
+			/*while(SensorUS(IN_3) <= DISTANCIA){
+				Float(OUT_AB);
+				Wait(500);
+            	OnFwd(OUT_A, VEL_LINEAR + VEL_ANG);
+				Wait(300);
+                OnRev(OUT_AB, VEL_LINEAR);
+            }*/
+
+		}
+
+        if(estado == GIRAR_DIREITA){
+        	OnFwd(OUT_B,VEL_LINEAR + VEL_ANG);
+            OnRev(OUT_A,VEL_LINEAR);
+        }
+
+        if(estado == GIRAR_ESQUERDA){
+        	OnFwd(OUT_A,VEL_LINEAR + VEL_ANG);
+         	OnRev(OUT_B, VEL_LINEAR);
+        }
+
+        NumOut(10, LCD_LINE1, Sensor(IN_1));
+        NumOut(40, LCD_LINE1, Sensor(IN_2));
+        NumOut(90, LCD_LINE2, SensorUS(IN_3));
+		
+		Wait(1000);
+		ClearScreen();
+		
+    }
+}

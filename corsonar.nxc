@@ -1,0 +1,107 @@
+#define PRETO 1
+#define BRANCO 6
+#define VERDE 3
+#define SENSOR_COR_DIR IN_1
+#define SENSOR_COR_ESQ IN_2
+#define VEL_LINEAR 40
+#define VEL_ANG 30
+
+enum{
+    IR_FRENTE = 1;
+    GIRAR_DIR = 2;
+    GIRAR_ESQ = 3;
+    VERDE_DIR = 4;
+    VERDE_ESQ = 5;
+    IR_FRENTE_P = 6
+};
+
+bool ir_frente(){
+    return(Sensor(SENSOR_COR_DIR) == BRANCO && Sensor(SENSOR_COR_ESQ) == BRANCO);
+}
+bool girar_direita(){
+    return(Sensor(SENSOR_COR_DIR) == PRETO && Sensor(SENSOR_COR_ESQ) == BRANCO );
+}
+bool girar_esquerda(){
+    return(Sensor(SENSOR_COR_ESQ) == PRETO && Sensor(SENSOR_COR_DIR) == BRANCO );
+}
+bool verde_direita(){
+    return(Sensor(SENSOR_COR_ESQ) == VERDE && (Sensor(SENSOR_COR_DIR) == BRANCO || Sensor(SENSOR_COR_DIR) == PRETO));
+}
+bool verde_esquerda(){
+    return(Sensor(SENSOR_COR_DIR) == VERDE && (Sensor(SENSOR_COR_ESQ) == BRANCO || Sensor(SENSOR_COR_ESQ) == PRETO));
+
+}
+bool ir_frente_preto(){
+    return(Sensor(SENSOR_COR_DIR) == PRETO && Sensor(SENSOR_COR_ESQ) == PRETO);
+}
+
+int determinarEstado(int e){
+    if(ir_frente() == true){
+        e = IR_FRENTE;
+    }
+    if(girar_direita() == true){
+        e = GIRAR_DIR;
+    }
+    if(girar_esquerda() == true){
+        e = GIRAR_ESQ;
+    }
+    if(verde_direita() == true){
+        e = VERDE_DIR;
+    }
+    if(verde_esquerda() == true){
+        e = VERDE_ESQ;
+    }
+    if(ir_frente_preto() == true){
+        e = IR_FRENTE_P;
+
+    }
+    if(estado == VERDE_DIR){
+        if(ir_frente_preto()){
+            e = GIRAR_DIR;
+        }
+        else{
+            e = VERDE_DIR;
+        }
+    }
+
+return e;
+
+}
+task main(){
+
+    SetSensor(SENSOR_COR_DIR, SENSOR_COLORFULL);
+    SetSensor(SENSOR_COR_ESQ, SENSOR_COLORFULL);
+        int estado;
+
+        while(true){
+        NumOut(40,LCD_LINE2,Sensor(SENSOR_COR_DIR));
+             NumOut(60,LCD_LINE2,Sensor(SENSOR_COR_ESQ));
+             TextOut(20,LCD_LINE3,"DFGNUJNG");
+                estado = determinarEstado(estado);
+            if(estado == IR_FRENTE){
+                OnRevReg(OUT_AB, VEL_LINEAR, OUT_REGMODE_SYNC);
+            }
+            if(estado == GIRAR_DIR){
+                OnRevReg(OUT_B,VEL_LINEAR + VEL_ANG, OUT_REGMODE_SYNC);
+                OnFwdReg(OUT_A,VEL_LINEAR, OUT_REGMODE_SYNC);
+            }
+            if(estado == GIRAR_ESQ){
+                OnRevReg(OUT_A,VEL_LINEAR + VEL_ANG, OUT_REGMODE_SYNC);
+                OnFwdReg(OUT_B,VEL_LINEAR, OUT_REGMODE_SYNC);
+
+            }
+            if(estado == VERDE_DIR){
+                OnRevReg(OUT_AB,VEL_LINEAR + VEL_ANG, OUT_REGMODE_SYNC);
+            }
+            /* if(estado == VERDE_ESQ){
+                OnRevReg(OUT_B,VEL_LINEAR + VEL_ANG, OUT_REGMODE_SYNC);
+                OnFwdReg(OUT_A,VEL_LINEAR, OUT_REGMODE_SYNC);
+            }*/
+            if(estado == IR_FRENTE_P){
+                OnRevReg(OUT_AB, VEL_LINEAR, OUT_REGMODE_SYNC);
+
+            }
+
+        }
+
+}

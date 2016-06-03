@@ -1,0 +1,105 @@
+#define PRETO 1
+#define BRANCO 6
+#define VERDE 3
+#define SENSOR_COR_DIR IN_1
+#define SENSOR_COR_ESQ IN_2
+#define SENSOR_SONAR IN_3
+#define DISTANCIA 12
+#define VEL_LINEAR 40
+#define VEL_ANG 35
+
+enum{
+    IR_FRENTE = 1;
+    GIRAR_DIR = 2;
+    GIRAR_ESQ = 3;
+    VERDE_DIR = 4;
+    VERDE_ESQ = 5;
+    DESVIAR_OBS = 8
+};
+
+bool branco_branco(){
+    return(Sensor(SENSOR_COR_DIR) == BRANCO && Sensor(SENSOR_COR_ESQ) == BRANCO);
+}
+
+bool preto_branco(){
+    return(Sensor(SENSOR_COR_DIR) == PRETO && Sensor(SENSOR_COR_ESQ) == BRANCO );
+}
+
+bool branco_preto(){
+    return(Sensor(SENSOR_COR_DIR) == BRANCO && Sensor(SENSOR_COR_ESQ) == PRETO);
+}
+
+bool obstaculo(){
+    return(SensorUS(SENSOR_SONAR) <= DISTANCIA);
+}
+
+bool verde_direita(){
+    return(Sensor(SENSOR_COR_ESQ) == VERDE);
+}
+
+bool verde_esquerda(){
+    return(Sensor(SENSOR_COR_DIR) == VERDE);
+}
+
+bool preto_preto(){
+    return(Sensor(SENSOR_COR_DIR) == PRETO && Sensor(SENSOR_COR_ESQ) == PRETO);
+}
+
+int determinarEstado(int e){
+    if(branco_branco()){
+        e = IR_FRENTE;
+    }
+    if(preto_branco()){
+        e = GIRAR_DIR;
+    }
+    if(branco_preto()){
+        e = GIRAR_ESQ;
+    }
+    if(obstaculo()){
+        e = DESVIAR_OBS;
+    }
+    if(verde_direita()){
+        e = VERDE_DIR;
+    }
+    if(verde_esquerda()){
+        e = VERDE_ESQ;
+    }
+
+    return e;
+
+}
+task main(){
+
+    SetSensorType(SENSOR_COR_DIR, SENSOR_TYPE_COLORFULL);
+    SetSensorType(SENSOR_COR_ESQ, SENSOR_TYPE_COLORFULL);
+    SetSensorType(SENSOR_SONAR, SENSOR_TYPE_LOWSPEED);
+
+    int estado;
+
+        while(true){
+
+            estado = determinarEstado(estado);
+			NumOut(50,LCD_LINE1,estado);
+
+            if(estado == IR_FRENTE){
+                OnRevReg(OUT_AB, VEL_LINEAR, OUT_REGMODE_SPEED);
+            }
+
+            if(estado == GIRAR_DIR){
+                OnRev(OUT_B, VEL_LINEAR + VEL_ANG);
+                Float(OUT_A);
+            }
+
+            if(estado == GIRAR_ESQ){
+                OnRev(OUT_A, VEL_LINEAR + VEL_ANG);
+                Float(OUT_B);
+            }
+
+            if(estado == DESVIAR_OBS){
+
+
+            }
+
+        }
+
+}

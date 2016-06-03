@@ -1,0 +1,33 @@
+#define SENSOR_SONAR IN_3
+#define DISTANCIA 10 //cm
+#define VEL_LINEAR 40
+#define VEL_ANG 20
+enum{
+    DESVIAR = 1;
+};
+
+bool desviar(){
+    return(SensorUS(SENSOR_SONAR) < DISTANCIA);
+}
+
+int determinarEstado(int estado){
+    if(desviar == true){
+        estado = DESVIAR;
+    }
+
+}
+
+task main(){
+    SetSensorType(SENSOR_SONAR, SENSOR_TYPE_LOWSPEED);
+    while(true){
+        OnRev(OUT_AB, VEL_LINEAR);
+        if(desviar() == true){
+            Off(OUT_AB);
+            OnFwd(OUT_A, VEL_ANG);
+			Wait(300);
+            OnRev(OUT_A, VEL_LINEAR + VEL_ANG);
+			Wait(300);
+            OnRev(OUT_AB, VEL_LINEAR);
+        }
+    }
+}

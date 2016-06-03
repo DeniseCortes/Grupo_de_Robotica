@@ -1,0 +1,77 @@
+//O #define: Define valores constantes dentro de todo o seu código
+#define white 50 // : Deixando um valor constante do que será usado em código como branco
+#define grey 35
+#define distancia 20
+
+bool obstaculo(){
+    return(SensorUS(IN_3) <= 0) ? false : SensorUS(IN_3) <= distancia;
+}
+int determinarEstado(int e){
+    if(obstaculo()){
+        e = 1;
+    }
+    else{
+        e = 0;
+    }
+}
+task main () {
+  int estado = 0;
+  int va = 45;
+  int l1 = 0;
+  int l2 = 0;
+
+    SetSensorLight(IN_1);
+    SetSensorLight(IN_2);
+    SetSensorLowspeed(IN_3);
+	while (true) {
+    estado = determinarEstado(estado);	
+	
+	l2 = Sensor(IN_1);
+	l1 = Sensor(IN_2);
+    if(l1 > white && l2 > white){
+        OnFwdSync(OUT_AB, va,0);
+        }
+    if(l1 < white && l2 >= grey){
+        int vbb = 15;
+        OnFwd(OUT_A, va+vbb);
+        OnRev(OUT_B, va);
+            vbb++;
+//	NumOut(70, LCD_LINE3, vbb);
+        }
+    if(l2 < white  && l1 >= grey ){
+        int vbb = 15;
+        OnFwd(OUT_B, va+vbb);
+        OnRev(OUT_A, va);
+            vbb++;
+//	NumOut(60, LCD_LINE3, vbb);
+      }
+     if(estado==1){
+	    RotateMotor(OUT_AB, 40, -240);
+		//passo 1 adquirir uma distancia segura do obstaculo
+	    RotateMotorEx(OUT_AB, 40, 580, 90, true, true);
+	    //passo 2 virar 90º para direita
+	    RotateMotor(OUT_AB, 40, 590);
+	    //passo 3 ir em linha reta até desviar do obstaculo
+	    RotateMotorEx(OUT_AB, 40, 430, -90, true, true);
+	    //virar mais 90º para direção oposta a virada anterior
+	    RotateMotor(OUT_AB, 40, 1300);
+	    //andar para frente para efetuar o desvio do obstaculo propriamente dito
+	    RotateMotorEx(OUT_AB, 40, 420, -90, true, true);
+	    //fccgazezrycdtufguighuigbvtrdxwatrdftudftrsdtstydtufcghcyrdtrd
+	    RotateMotor(OUT_AB, 40, 620);
+	    //asuiohfuishfjsnfjksdnfkjnsdfbdfuigbdfuibgduifbguidfbgçbngçndoçgd
+	    RotateMotorEx(OUT_AB, 40, 590, 90, true, true);
+      }
+		ClearScreen();
+		TextOut(0, LCD_LINE3, "sonar");
+	    NumOut(60, LCD_LINE3, SensorUS(IN_3));
+
+		TextOut(0, LCD_LINE4, "sens_dir");
+		NumOut(60, LCD_LINE4, l2);
+
+		TextOut(0, LCD_LINE5, "sens_esq");
+		NumOut(60, LCD_LINE5, l1);
+		Wait(100);
+		
+  }
+}
